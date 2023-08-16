@@ -3,33 +3,62 @@ session_start();
 require_once "./../connections/connections.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Memulai sesi dan memerlukan file koneksi ke database
+
     $nama_guru = $_POST["nama_guru"];
     $nip = $_POST["nip"];
     $pendidikan = $_POST["pendidikan"];
     $jabatan = $_POST["jabatan"];
     $status = $_POST["status"];
     $keterangan = $_POST["keterangan"];
+    // Mengambil nilai yang diinputkan oleh pengguna melalui form
 
-    $gambar = $_FILES['foto']['name'];
-    $gambar_tmp = $_FILES['foto']['tmp_name'];
-    $gambar_path = "uploads/guru/" . $gambar;
-
-    if (move_uploaded_file($gambar_tmp, $gambar_path)) {
-        $sql = "INSERT INTO tb_guru (nama_guru, nip, pendidikan, foto, jabatan, status, keterangan)
-                VALUES ('$nama_guru', '$nip', '$pendidikan', '$gambar', '$jabatan', '$status', '$keterangan')";
-
-        if ($conn->query($sql) === TRUE) {
-            $conn->close();
-            echo '<script>window.location.href = "admin.php?p=guru";</script>';
-            exit();
+    if (!empty($_FILES['foto']['name'])) {
+        // Cek apakah gambar diunggah
+    
+        $gambar = $_FILES['foto']['name'];
+        $gambar_tmp = $_FILES['foto']['tmp_name'];
+        $gambar_path = "uploads/guru/" . $gambar;
+        // Mengambil informasi file gambar yang diunggah melalui input "foto"
+    
+        if (move_uploaded_file($gambar_tmp, $gambar_path)) {
+            // Jika berhasil mengunggah file gambar ke lokasi yang ditentukan
+    
+            $sql = "INSERT INTO tb_guru (nama_guru, nip, pendidikan, foto, jabatan, status, keterangan)
+                    VALUES ('$nama_guru', '$nip', '$pendidikan', '$gambar', '$jabatan', '$status', '$keterangan')";
+            // Membuat pernyataan SQL untuk menyisipkan data guru ke dalam tabel "tb_guru"
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            // Jika gagal mengunggah file gambar
+    
+            echo "Gagal mengunggah gambar.";
+            exit();
         }
     } else {
-        echo "Gagal mengunggah gambar.";
+        // Jika gambar tidak diunggah, tidak perlu memasukkan kolom "foto" ke dalam query
+    
+        $sql = "INSERT INTO tb_guru (nama_guru, nip, pendidikan, jabatan, status, keterangan)
+                VALUES ('$nama_guru', '$nip', '$pendidikan', '$jabatan', '$status', '$keterangan')";
+    }
+    
+    if ($conn->query($sql) === TRUE) {
+        // Jika pernyataan SQL berhasil dieksekusi
+    
+        $conn->close();
+        // Menutup koneksi ke database
+    
+        echo '<script>window.location.href = "admin.php?p=guru";</script>';
+        // Mengarahkan halaman kembali ke halaman "admin.php?p=guru" setelah data guru berhasil ditambahkan
+        exit();
+    } else {
+        // Jika terjadi kesalahan saat mengeksekusi pernyataan SQL
+    
+        echo "Error: " . $sql . "<br>" . $conn->error;
+        // Menampilkan pesan error beserta informasi kesalahan dari database
     }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -71,7 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="form-group">
                 <label for="foto">Foto:</label>
-                <input type="file" name="foto" accept="image/*" required>
+                <input type="file" name="foto" accept="image/*">
             </div>
             <div class="form-group submit-button">
                 <button class="btn btn-success" type="submit" name="submit">Submit</button>

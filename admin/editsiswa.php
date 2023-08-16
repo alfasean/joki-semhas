@@ -1,8 +1,13 @@
 <?php
+// Memulai sesi
 session_start();
+
+// Memanggil file koneksi database
 require_once "./../connections/connections.php";
 
+// Cek apakah request menggunakan metode POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Mengambil data siswa dari input form
     $nama_siswa = $_POST["nama_siswa"];
     $tempat_lahir = $_POST["tempat_lahir"];
     $tgl_lahir = $_POST["tgl_lahir"];
@@ -14,18 +19,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nis = $_POST["nis"];
     $nama_ayah = $_POST["nama_ayah"];
     $nama_ibu = $_POST["nama_ibu"];
-    
+
+    // Cek apakah ada gambar yang diunggah melalui form
     if (!empty($_FILES['foto']['name'])) {
         $gambar = $_FILES['foto']['name'];
         $gambar_tmp = $_FILES['foto']['tmp_name'];
         $gambar_path = "uploads/siswa/" . $gambar;
 
+        // Jika ada gambar yang diunggah, pindahkan gambar ke folder uploads/siswa
         if (move_uploaded_file($gambar_tmp, $gambar_path)) {
-            $sql = "UPDATE tb_siswa SET nama_siswa='$nama_siswa', tempat_lahir='$tempat_lahir', tgl_lahir='$tgl_lahir', 
-            foto='$gambar', jenis_kelamin='$jenis_kelamin', agama='$agama', rombel='$rombel', nik='$nik', nisn='$nisn', nis='$nis', nama_ayah='$nama_ayah', nama_ibu='$nama_ibu' WHERE id_siswa='$_GET[menu_upd]'";
+            // Buat query SQL untuk mengupdate data siswa berdasarkan id_siswa yang diberikan melalui parameter GET (menu_upd)
+            $sql = "UPDATE tb_siswa SET nama_siswa='$nama_siswa', tempat_lahir='$tempat_lahir', tgl_lahir='$tgl_lahir', foto='$gambar', jenis_kelamin='$jenis_kelamin', agama='$agama', rombel='$rombel', nik='$nik', nisn='$nisn', nis='$nis', nama_ayah='$nama_ayah', nama_ibu='$nama_ibu' WHERE id_siswa='$_GET[menu_upd]'";
 
+            // Eksekusi perintah SQL untuk melakukan update data siswa
             if ($conn->query($sql) === TRUE) {
                 $conn->close();
+                // Alihkan halaman kembali ke halaman admin.php dengan parameter p=siswa setelah berhasil mengupdate data
                 echo '<script>window.location.href = "admin.php?p=siswa";</script>';
                 exit();
             } else {
@@ -35,10 +44,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Gagal mengunggah gambar.";
         }
     } else {
+        // Jika tidak ada gambar yang diunggah, buat query SQL untuk mengupdate data siswa (tanpa mengubah gambar)
         $sql = "UPDATE tb_siswa SET nama_siswa='$nama_siswa', tempat_lahir='$tempat_lahir', tgl_lahir='$tgl_lahir', jenis_kelamin='$jenis_kelamin', agama='$agama', rombel='$rombel', nik='$nik', nisn='$nisn', nis='$nis', nama_ayah='$nama_ayah', nama_ibu='$nama_ibu' WHERE id_siswa='$_GET[menu_upd]'";
 
+        // Eksekusi perintah SQL untuk melakukan update data siswa
         if ($conn->query($sql) === TRUE) {
             $conn->close();
+            // Alihkan halaman kembali ke halaman admin.php dengan parameter p=siswa setelah berhasil mengupdate data
             echo '<script>window.location.href = "admin.php?p=siswa";</script>';
             exit();
         } else {
@@ -60,18 +72,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-    <?php
+<?php
     require_once "./../connections/connections.php";
 
+    // Mengecek koneksi database
     if ($conn->connect_error) {
         die("Koneksi gagal: " . $conn->connect_error);
     }
 
+    // Mengecek apakah ada parameter menu_upd pada URL (request GET)
     if (isset($_GET['menu_upd'])) {
-        $sql = "SELECT * FROM tb_siswa WHERE id_siswa='$_GET[menu_upd]'";
+        // Mengambil id_siswa dari parameter GET
+        $id_siswa = $_GET['menu_upd'];
+
+        // Membuat query SQL untuk mengambil data siswa berdasarkan id_siswa yang diberikan melalui parameter GET (menu_upd)
+        $sql = "SELECT * FROM tb_siswa WHERE id_siswa='$id_siswa'";
         $result = mysqli_query($conn, $sql);
         $row = mysqli_fetch_assoc($result);
     } else {
+        // Jika tidak ada parameter menu_upd, maka menampilkan pesan "Invalid request."
         echo "Invalid request.";
         exit();
     }

@@ -3,6 +3,8 @@ session_start();
 require_once "./../connections/connections.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Memulai sesi dan memerlukan file koneksi ke database
+
     $nama_siswa = $_POST["nama_siswa"];
     $tempat_lahir = $_POST["tempat_lahir"];
     $tgl_lahir = $_POST["tgl_lahir"];
@@ -14,27 +16,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nis = $_POST["nis"];
     $nama_ayah = $_POST["nama_ayah"];
     $nama_ibu = $_POST["nama_ibu"];
+    // Mengambil nilai yang diinputkan oleh pengguna melalui form untuk data siswa, seperti nama, tempat lahir, tanggal lahir, jenis kelamin, agama, rombel, nik, nisn, nis, nama ayah, dan nama ibu.
 
-    $gambar = $_FILES['foto']['name'];
-    $gambar_tmp = $_FILES['foto']['tmp_name'];
-    $gambar_path = "uploads/siswa/" . $gambar;
-
-    if (move_uploaded_file($gambar_tmp, $gambar_path)) {
-        $sql = "INSERT INTO tb_siswa (nama_siswa, tempat_lahir, tgl_lahir, foto, agama, rombel, nik, nisn, nis, nama_ayah, nama_ibu, jenis_kelamin)
-                VALUES ('$nama_siswa', '$tempat_lahir', '$tgl_lahir', '$gambar', '$agama', '$rombel', '$nik', '$nisn', '$nis', '$nama_ayah', '$nama_ibu', '$jenis_kelamin')";
-
-        if ($conn->query($sql) === TRUE) {
-            $conn->close();
-            echo '<script>window.location.href = "admin.php?p=siswa";</script>';
-            exit();
+    if (!empty($_FILES['foto']['name'])) {
+        // Cek apakah ada gambar diunggah
+        $gambar = $_FILES['foto']['name'];
+        $gambar_tmp = $_FILES['foto']['tmp_name'];
+        $gambar_path = "uploads/siswa/" . $gambar;
+        // Mengambil informasi tentang file gambar yang diunggah oleh pengguna melalui input "foto"
+    
+        if (move_uploaded_file($gambar_tmp, $gambar_path)) {
+            // Jika berhasil mengunggah file gambar ke lokasi yang ditentukan
+    
+            $sql = "INSERT INTO tb_siswa_1 (nama_siswa, tempat_lahir, tgl_lahir, foto, agama, rombel, nik, nisn, nis, nama_ayah, nama_ibu, jenis_kelamin)
+                    VALUES ('$nama_siswa', '$tempat_lahir', '$tgl_lahir', '$gambar', '$agama', '$rombel', '$nik', '$nisn', '$nis', '$nama_ayah', '$nama_ibu', '$jenis_kelamin')";
+            // Membuat pernyataan SQL untuk menyisipkan data siswa ke dalam tabel "tb_siswa_1" dengan menyertakan path gambar untuk kolom "foto".
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            // Jika gagal mengunggah file gambar
+            echo "Gagal mengunggah gambar.";
+            exit();
         }
     } else {
-        echo "Gagal mengunggah gambar.";
+        // Jika tidak ada gambar yang diunggah, data siswa akan disimpan tanpa menyertakan kolom "foto".
+        $sql = "INSERT INTO tb_siswa_1 (nama_siswa, tempat_lahir, tgl_lahir, agama, rombel, nik, nisn, nis, nama_ayah, nama_ibu, jenis_kelamin)
+                VALUES ('$nama_siswa', '$tempat_lahir', '$tgl_lahir', '$agama', '$rombel', '$nik', '$nisn', '$nis', '$nama_ayah', '$nama_ibu', '$jenis_kelamin')";
+    }
+
+    if ($conn->query($sql) === TRUE) {
+        // Jika pernyataan SQL berhasil dieksekusi
+
+        $conn->close();
+        // Menutup koneksi ke database
+
+        echo '<script>window.location.href = "admin.php?p=siswa";</script>';
+        // Mengarahkan halaman kembali ke halaman "admin.php?p=siswa" setelah data siswa berhasil ditambahkan.
+        exit();
+    } else {
+        // Jika terjadi kesalahan saat mengeksekusi pernyataan SQL
+
+        echo "Error: " . $sql . "<br>" . $conn->error;
+        // Menampilkan pesan error beserta informasi kesalahan dari database
     }
 }
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,11 +78,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form action="" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nama_siswa">Nama:</label>
-                <input type="text" id="nama_siswa" name="nama_siswa" required>
+                <input type="text" id="nama_siswa" name="nama_siswa" >
             </div>
             <div class="form-group">
                 <label for="rombel">Rombel:</label>
-                <input type="text" id="rombel" name="rombel" required>
+                <input type="text" id="rombel" name="rombel" >
             </div>
             <div class="form-group">
             <label for="jenis_kelamin">Jenis Kelamin:</label>
@@ -67,23 +93,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="form-group">
                 <label for="nisn">NISN:</label>
-                <input type="text" id="nisn" name="nisn" required>
+                <input type="text" id="nisn" name="nisn" >
             </div>
             <div class="form-group">
                 <label for="nis">NIS:</label>
-                <input type="text" id="nis" name="nis" required>
+                <input type="text" id="nis" name="nis" >
             </div>
             <div class="form-group">
                 <label for="tempat_lahir">Tempat Lahir:</label>
-                <input type="text" id="tempat_lahir" name="tempat_lahir" required>
+                <input type="text" id="tempat_lahir" name="tempat_lahir" >
             </div>
             <div class="form-group">
                 <label for="tanggal_lahir">Tanggal Lahir:</label>
-                <input type="date" id="tanggal_lahir" name="tgl_lahir" required>
+                <input type="date" id="tanggal_lahir" name="tgl_lahir" >
             </div>
             <div class="form-group">
                 <label for="nik">NIK:</label>
-                <input type="text" id="nik" name="nik" required>
+                <input type="text" id="nik" name="nik" >
             </div>
             <div class="form-group">
             <label for="agama">Agama:</label>
@@ -98,15 +124,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="form-group">
                 <label for="nama_ayah">Nama Ayah:</label>
-                <input type="text" id="nama_ayah" name="nama_ayah" required>
+                <input type="text" id="nama_ayah" name="nama_ayah" >
             </div>
             <div class="form-group">
                 <label for="nama_ibu">Nama Ibu:</label>
-                <input type="text" id="nama_ibu" name="nama_ibu" required>
+                <input type="text" id="nama_ibu" name="nama_ibu" >
             </div>
             <div class="form-group">
                 <label for="foto">Foto:</label>
-                <input type="file" name="foto" accept="image/*" required>
+                <input type="file" name="foto" accept="image/*" >
             </div>
             <div class="form-group submit-button">
                 <button class="btn btn-success" type="submit" name="submit">Submit</button>

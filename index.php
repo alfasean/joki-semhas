@@ -57,7 +57,7 @@
                     <div class="dropdown-menu fade-down m-0">
                         <a href="index.php?p=guru" class="dropdown-item">Tenaga Pendidik</a>
                         <a href="siswa.php" class="dropdown-item">Siswa</a>
-                        <a href="index.php?p=event" class="dropdown-item">Event Sekolah</a>
+                        <!-- <a href="index.php?p=event" class="dropdown-item">Event Sekolah</a> -->
                         <a href="index.php?p=danabos" class="dropdown-item">Dana Bos</a>
                         <a href="kalender.php" class="dropdown-item">Kalender Akademik</a>
                     </div>
@@ -105,6 +105,9 @@
     		break;
     		case "event";
     			include 'eventsekolah.php';
+    		break;
+    		case "sejarahdetail";
+    			include 'sejarahdetail.php';
     		break;
     	}
     	?>

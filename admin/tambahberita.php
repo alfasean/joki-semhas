@@ -2,28 +2,44 @@
 session_start();
 require_once "./../connections/connections.php";
 
+// Mulai sesi PHP
+// Mengimpor file koneksi untuk menjalankan koneksi ke database
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Cek apakah request method adalah POST
+
     $judul = $_POST["judul"];
     $tgl_publish = $_POST["tgl_publish"];
     $deskripsi = $_POST["deskripsi"];
+    // Ambil data yang dikirimkan melalui form dengan metode POST
 
     $gambar = $_FILES['foto']['name'];
     $gambar_tmp = $_FILES['foto']['tmp_name'];
     $gambar_path = "uploads/berita/" . $gambar;
+    // Ambil data gambar yang diunggah melalui form
 
     if (move_uploaded_file($gambar_tmp, $gambar_path)) {
+        // Pindahkan gambar ke direktori tujuan (uploads/berita/)
+
         $sql = "INSERT INTO tb_berita (judul, tgl_publish, deskripsi, foto)
                 VALUES ('$judul', '$tgl_publish', '$deskripsi', '$gambar')";
+        // Buat query SQL untuk menyimpan data berita ke database
 
         if ($conn->query($sql) === TRUE) {
+            // Jalankan query dan periksa apakah berhasil
+
             $conn->close();
+            // Tutup koneksi ke database
             echo '<script>window.location.href = "admin.php?p=berita";</script>';
+            // Redirect ke halaman berita setelah berhasil menyimpan data
             exit();
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
+            // Tampilkan pesan error jika query gagal dieksekusi
         }
     } else {
         echo "Gagal mengunggah gambar.";
+        // Tampilkan pesan error jika gagal mengunggah gambar
     }
 }
 ?>

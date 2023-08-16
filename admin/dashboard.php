@@ -7,10 +7,10 @@
     $data = mysqli_fetch_assoc($result);
     $total_guru = $data['total_guru'];
 
-    $query = "SELECT COUNT(*) as total_siswa FROM tb_siswa";
-    $result = mysqli_query($conn, $query);
-    $data = mysqli_fetch_assoc($result);
-    $total_siswa = $data['total_siswa'];
+    // $query = "SELECT COUNT(*) as total_siswa FROM tb_siswa";
+    // $result = mysqli_query($conn, $query);
+    // $data = mysqli_fetch_assoc($result);
+    // $total_siswa = $data['total_siswa'];
 
     $query = "SELECT COUNT(*) as total_berita FROM tb_berita";
     $result = mysqli_query($conn, $query);

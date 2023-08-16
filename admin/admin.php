@@ -139,6 +139,29 @@ require_once "./../connections/connections.php";
                     <p>Dana BOS</p>
                   </a>
                 </li>
+                <li class="nav-item">
+                  <a href="admin.php?p=sejarah" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Sejarah</p>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-copy"></i>
+                <p>
+                  Kelas
+                  <i class="fas fa-angle-left right"></i>
+                </p>
+              </a>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="siswa.php" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Kelas 1</p>
+                  </a>
+                </li>
               </ul>
             </li>
             <li class="nav-item">
@@ -224,6 +247,15 @@ require_once "./../connections/connections.php";
     		break;
         case "editevent";
     			include 'editevent.php';
+    		break;
+        case "sejarah";
+    			include 'sejarah.php';
+    		break;
+        case "addsejarah";
+    			include 'tambahsejarah.php';
+    		break;
+        case "editsejarah";
+    			include 'editsejarah.php';
     		break;
     	}
     	?>

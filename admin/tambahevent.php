@@ -3,29 +3,48 @@ session_start();
 require_once "./../connections/connections.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Memulai sesi dan memerlukan file koneksi ke database
+
     $judul = $_POST["judul"];
     $deskripsi = $_POST["deskripsi"];
+    // Mengambil nilai judul dan deskripsi dari data yang dikirim melalui metode POST
 
     $gambar = $_FILES['foto']['name'];
     $gambar_tmp = $_FILES['foto']['tmp_name'];
     $gambar_path = "uploads/event_sekolah/" . $gambar;
+    // Mengambil informasi file gambar yang diunggah melalui input "foto"
 
     if (move_uploaded_file($gambar_tmp, $gambar_path)) {
+        // Jika berhasil mengunggah file gambar ke lokasi yang ditentukan
+
         $sql = "INSERT INTO tb_event (judul, deskripsi, gambar)
                 VALUES ('$judul', '$deskripsi', '$gambar')";
+        // Membuat pernyataan SQL untuk menyisipkan data ke dalam tabel "tb_event"
 
         if ($conn->query($sql) === TRUE) {
+            // Jika pernyataan SQL berhasil dieksekusi
+
             $conn->close();
+            // Menutup koneksi ke database
+
             echo '<script>window.location.href = "admin.php?p=event";</script>';
+            // Mengarahkan halaman kembali ke halaman "admin.php?p=event" setelah data berhasil ditambahkan
             exit();
         } else {
+            // Jika terjadi kesalahan saat mengeksekusi pernyataan SQL
+
             echo "Error: " . $sql . "<br>" . $conn->error;
+            // Menampilkan pesan error beserta informasi kesalahan dari database
         }
     } else {
+        // Jika gagal mengunggah file gambar
+
         echo "Gagal mengunggah gambar.";
+        // Menampilkan pesan bahwa gambar gagal diunggah
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 

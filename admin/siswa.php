@@ -2,13 +2,19 @@
 session_start();
 require_once "./../connections/connections.php";
 
+// Mulai sesi PHP
+// Mengimpor file koneksi untuk menjalankan koneksi ke database
+
 if (!$conn) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
+// Jika koneksi ke database gagal, tampilkan pesan kesalahan dan hentikan eksekusi
 
 $limit = 5;
+// Jumlah data yang akan ditampilkan per halaman
 
-$totalRows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM tb_siswa"));
+$totalRows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM tb_siswa_1"));
+// Menghitung jumlah total data siswa dalam tabel
 
 // Menghitung jumlah total halaman
 $totalPages = ceil($totalRows / $limit);
@@ -18,16 +24,29 @@ if (isset($_GET['page'])) {
 } else {
     $currentPage = 1;
 }
+// Mendapatkan halaman saat ini dari URL, jika tidak ada, atur ke halaman 1
 
 if ($currentPage > $totalPages) {
     $currentPage = $totalPages;
 }
+// Pastikan halaman saat ini tidak melebihi jumlah total halaman
 
-$offset = ($currentPage - 1) * $limit;
+$offset = max(0, ($currentPage - 1) * $limit);
+
 
 $searchKeyword = isset($_GET['search']) ? $_GET['search'] : '';
-$query = "SELECT * FROM tb_siswa WHERE nama_siswa LIKE '%$searchKeyword%' LIMIT $offset, $limit";
+// Mendapatkan kata kunci pencarian dari URL, jika tidak ada, setel ke string kosong
+
+$query = "SELECT * FROM tb_siswa_1 WHERE nama_siswa LIKE '%$searchKeyword%' LIMIT $offset, $limit";
+// Query SQL untuk memilih data siswa berdasarkan kata kunci pencarian dan batasan halaman
 $result = mysqli_query($conn, $query);
+
+if (!$result) {
+    die('Error executing query: ' . mysqli_error($conn));
+} else if (mysqli_num_rows($result) == 0) {
+    echo 'Tidak ada data siswa.';
+}
+
 
 ?>
 
@@ -191,7 +210,7 @@ $result = mysqli_query($conn, $query);
       <!-- /.sidebar -->
     </aside>
 
-	<div class="content-wrapper">
+    <div class="content-wrapper">
     <div class="container-xl">
         <div class="table-responsive">
             <div class="table-wrapper mt-5">
@@ -205,11 +224,11 @@ $result = mysqli_query($conn, $query);
                 </div>
 
                 <form action="" method="GET" class="mb-3">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Cari siswa..." value="<?php echo $searchKeyword; ?>">
-            <button type="submit" class="btn btn-primary" style="border-radius: 4px;">Cari</button>
-        </div>
-    </form>
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Cari rombel..." value="<?php echo $searchKeyword; ?>">
+                        <button type="submit" class="btn btn-primary" style="border-radius: 4px;">Cari</button>
+                    </div>
+                </form>
 
                 <?php
                 require_once "./../connections/connections.php";
@@ -220,7 +239,7 @@ $result = mysqli_query($conn, $query);
 
                 $limit = 5;
 
-                $totalRows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM tb_siswa"));
+                $totalRows = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM tb_siswa_1"));
 
                 $totalPages = ceil($totalRows / $limit);
 
@@ -237,85 +256,88 @@ $result = mysqli_query($conn, $query);
                 $offset = ($currentPage - 1) * $limit;
 
                 $searchKeyword = isset($_GET['search']) ? $_GET['search'] : '';
-                $query = "SELECT * FROM tb_siswa WHERE nama_siswa LIKE '%$searchKeyword%' LIMIT $offset, $limit";
+                $query = "SELECT * FROM tb_siswa_1 WHERE rombel LIKE '%$searchKeyword%' LIMIT $offset, $limit";
                 $result = mysqli_query($conn, $query);
 
-                if (mysqli_num_rows($result) > 0) {
+                if ($result) {
+                    if (mysqli_num_rows($result) > 0) {
+                        echo '<table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Rombel</th>
+                                        <th>Jenis Kelamin</th>
+                                        <th>NISN</th>
+                                        <th>NIS</th>
+                                        <th>Tempat Lahir</th>
+                                        <th>Tanggal Lahir</th>
+                                        <th>NIK</th>
+                                        <th>Agama</th>
+                                        <th>Nama Ayah</th>
+                                        <th>Nama Ibu</th>
+                                        <th>Foto</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>';
 
-                    echo '<table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Rombel</th>
-                                    <th>Jenis Kelamin</th>
-                                    <th>NISN</th>
-                                    <th>NIS</th>
-                                    <th>Tempat Lahir</th>
-                                    <th>Tanggal Lahir</th>
-                                    <th>NIK</th>
-                                    <th>Agama</th>
-                                    <th>Nama Ayah</th>
-                                    <th>Nama Ibu</th>
-                                    <th>Foto</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>';
+                        $no = $offset + 1;
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo '<tr>
+                                    <td>' . $no . '</td>
+                                    <td>' . $row['nama_siswa'] . '</td>
+                                    <td>' . $row['rombel'] . '</td>
+                                    <td>' . $row['jenis_kelamin'] . '</td>
+                                    <td>' . $row['nisn'] . '</td>
+                                    <td>' . $row['nis'] . '</td>
+                                    <td>' . $row['tempat_lahir'] . '</td>
+                                    <td>' . $row['tgl_lahir'] . '</td>
+                                    <td>' . $row['nik'] . '</td>
+                                    <td>' . $row['agama'] . '</td>
+                                    <td>' . $row['nama_ayah'] . '</td>
+                                    <td>' . $row['nama_ibu'] . '</td>
+                                    <td><img src="uploads/siswa/' . $row['foto'] . '" width="100" height="100" alt="Foto Siswa"></td>
+                                    <td>
+                                        <a style="color: #F2BE22;" href="admin.php?p=editsiswa&menu_upd=' . $row['id_siswa'] . '"" class="edit"><i class="material-icons" data-toggle="tooltip"
+                                                title="Edit">&#xE254;</i></a>
+                                        <a style="color: #CD1818;" href="deletesiswa.php?menu_del=' . $row['id_siswa'] . '" class="delete"><i class="material-icons"
+                                                data-toggle="tooltip" title="Hapus">&#xE872;</i></a>
+                                    </td>
+                                </tr>';
+                            $no++;
+                        }
 
-                    $no = $offset + 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo '<tr>
-                                <td>' . $no . '</td>
-                                <td>' . $row['nama_siswa'] . '</td>
-                                <td>' . $row['rombel'] . '</td>
-                                <td>' . $row['jenis_kelamin'] . '</td>
-                                <td>' . $row['nisn'] . '</td>
-                                <td>' . $row['nis'] . '</td>
-                                <td>' . $row['tempat_lahir'] . '</td>
-                                <td>' . $row['tgl_lahir'] . '</td>
-                                <td>' . $row['nik'] . '</td>
-                                <td>' . $row['agama'] . '</td>
-                                <td>' . $row['nama_ayah'] . '</td>
-                                <td>' . $row['nama_ibu'] . '</td>
-                                <td><img src="uploads/siswa/' . $row['foto'] . '" width="100" height="100" alt="Foto Siswa"></td>
-                                <td>
-                                    <a style="color: #F2BE22;" href="admin.php?p=editsiswa&menu_upd=' . $row['id_siswa'] . '"" class="edit"><i class="material-icons" data-toggle="tooltip"
-                                            title="Edit">&#xE254;</i></a>
-                                    <a style="color: #CD1818;" href="deletesiswa.php?menu_del=' . $row['id_siswa'] . '" class="delete"><i class="material-icons"
-                                            data-toggle="tooltip" title="Hapus">&#xE872;</i></a>
-                                </td>
-                            </tr>';
-                        $no++;
+                        echo '</table>';
+
+                        // Pagination
+                        echo '<nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">';
+
+                        if ($currentPage > 1) {
+                            echo '<li class="page-item">
+                                    <a class="page-link" href="?page=' . ($currentPage - 1) . '&search=' . $searchKeyword . '">Previous</a>
+                                </li>';
+                        }
+
+                        for ($i = 1; $i <= $totalPages; $i++) {
+                            echo '<li class="page-item ' . (($i == $currentPage) ? 'active' : '') . '">
+                                    <a class="page-link" href="?page=' . $i . '&search=' . $searchKeyword . '">' . $i . '</a>
+                                </li>';
+                        }
+
+                        if ($currentPage < $totalPages) {
+                            echo '<li class="page-item">
+                                    <a class="page-link" href="?page=' . ($currentPage + 1) . '&search=' . $searchKeyword . '">Next</a>
+                                </li>';
+                        }
+
+                        echo '</ul>
+                            </nav>';
+                    } else {
+                        echo 'Tidak ada data siswa.';
                     }
-
-                    echo '</table>';
-
-                    // Pagination
-                    echo '<nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">';
-
-                    if ($currentPage > 1) {
-                        echo '<li class="page-item">
-                                <a class="page-link" href="?page=' . ($currentPage - 1) . '&search=' . $searchKeyword . '">Previous</a>
-                            </li>';
-                    }
-
-                    for ($i = 1; $i <= $totalPages; $i++) {
-                        echo '<li class="page-item ' . (($i == $currentPage) ? 'active' : '') . '">
-                                <a class="page-link" href="?page=' . $i . '&search=' . $searchKeyword . '">' . $i . '</a>
-                            </li>';
-                    }
-
-                    if ($currentPage < $totalPages) {
-                        echo '<li class="page-item">
-                                <a class="page-link" href="?page=' . ($currentPage + 1) . '&search=' . $searchKeyword . '">Next</a>
-                            </li>';
-                    }
-
-                    echo '</ul>
-                        </nav>';
                 } else {
-                    echo 'Tidak ada data siswa.';
+                    echo 'Tidak ada data.';
                 }
 
                 mysqli_close($conn);
